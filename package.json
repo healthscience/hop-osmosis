@@ -1,0 +1,20 @@
+{
+  "name": "hop-osmosis",
+  "version": "0.0.1",
+  "description": "aborbing cues computational knowledge",
+  "homepage": "https://github.com/healthscience/hop-osmosis#readme",
+  "bugs": {
+    "url": "https://github.com/healthscience/hop-osmosis/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/healthscience/hop-osmosis.git"
+  },
+  "license": "ISC",
+  "author": "aboynajames",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "test"
+  }
+}
