@@ -44,6 +44,7 @@ export function resolveEntry(inputString, seedLibrary) {
     datatypeRegex = /.*/i; 
   } else {
     // It's a keyword (e.g., 'kitesurfing')
+    // hop-osmosis/src/lib/resolver.js:47
     const seed = seedLibrary.resolve(rawTarget);
     if (!seed) {
       throw new Error(`[osmosis:resolver] Keyword '${rawTarget}' not found in Seed Library.`);
