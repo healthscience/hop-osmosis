@@ -56,8 +56,6 @@ export function resolveEntry(inputString, seedLibrary) {
     datatypeRegex = new RegExp(`(${rawTarget}|exoBoundary|orgoData)`, 'i');
   }
 
-  console.log(`[osmosis:resolver] Target Resolved -> Hash: ${rootHash.substring(0,8)}..., Salt: ${salt ? 'yes' : 'no'}`);
-
   return {
     rootHash,
     salt,

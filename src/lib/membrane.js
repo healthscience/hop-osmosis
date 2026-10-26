@@ -7,7 +7,6 @@ export function evaluateManifest(manifest, currentBudget) {
   const energyCost = manifest.energyCost ?? 0;
   const budget = typeof currentBudget === 'number' ? currentBudget : Infinity;
 
-  console.log(`[osmosis] Manifest Size: ${totalBytes} bytes, Cost: ${energyCost} (Available Budget: ${budget})`);
   return energyCost <= budget;
 }
 

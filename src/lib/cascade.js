@@ -11,14 +11,13 @@
  * @returns {Promise<object>} Summary of replicated keys, paths, and durations
  */
 export async function replicateHyperdrivePaths(peer, filteredCues) {
+
   const startTime = Date.now();
 
   if (!Array.isArray(filteredCues) || filteredCues.length === 0) {
     console.warn('[osmosis:cascade:trace] Abort: filteredCues is empty or non-array.');
     return { syncedBees: [], syncedDrives: [], durationMs: 0 };
   }
-
-  console.log(`[osmosis:cascade:trace] Inspecting ${filteredCues.length} cue(s) for hyper-resources...`);
 
   const driveQueue = new Map(); // Deduplicate Hyperdrive paths
   const beeQueue = new Map();   // Deduplicate Hyperbee keys/manifests
@@ -42,15 +41,12 @@ export async function replicateHyperdrivePaths(peer, filteredCues) {
     const beeKey = ref.beeKey || ref.publicLibraryKey || ref.beeSpecs?.key || cue.beeKey;
     if (beeKey) beeQueue.set(beeKey, { type: 'hyperbee', cueIndex: index });
 
-    console.log(`[osmosis:cascade:trace] Cue [${index}] keys extracted -> beeKey: ${beeKey || 'none'} | orgoPath: ${orgoPath || 'none'} | gellePath: ${gellePath || 'none'}`);
   });
 
   if (driveQueue.size === 0 && beeQueue.size === 0) {
     console.warn('[osmosis:cascade:trace] No external Hyperdrive or Hyperbee resources extracted from cues.');
     return { syncedBees: [], syncedDrives: [], durationMs: Date.now() - startTime };
   }
-
-  console.log(`[osmosis:cascade:trace] Enforcing atomic replication for ${beeQueue.size} Hyperbee(s) and ${driveQueue.size} Hyperdrive path(s).`);
 
   const syncPromises = [];
   const syncedBees = [];
@@ -59,7 +55,6 @@ export async function replicateHyperdrivePaths(peer, filteredCues) {
   // 2. Queue Hyperbee replications
   for (const [beeKey, meta] of beeQueue.entries()) {
     const beeStart = Date.now();
-    console.log(`[osmosis:cascade:trace] Syncing ${meta.type} [Key: ${beeKey}]`);
 
     const syncBee = (async () => {
       let dispatchedBranch = 'none';
@@ -79,7 +74,7 @@ export async function replicateHyperdrivePaths(peer, filteredCues) {
       }
 
       const elapsed = Date.now() - beeStart;
-      console.log(`[osmosis:cascade:trace] Completed ${meta.type} [Key: ${beeKey}] via ${dispatchedBranch} in ${elapsed}ms`);
+
       syncedBees.push({ key: beeKey, branch: dispatchedBranch, durationMs: elapsed });
     })().catch(err => {
       console.error(`[osmosis:cascade:trace] ERROR: Failed to replicate ${meta.type} key ${beeKey}:`, err.stack || err.message);
@@ -92,7 +87,6 @@ export async function replicateHyperdrivePaths(peer, filteredCues) {
   // 3. Queue Hyperdrive path replications
   for (const [drivePath, meta] of driveQueue.entries()) {
     const driveStart = Date.now();
-    console.log(`[osmosis:cascade:trace] Syncing ${meta.type} [Path: ${drivePath}]`);
 
     const syncDrive = (async () => {
       let dispatchedBranch = 'none';
@@ -109,7 +103,7 @@ export async function replicateHyperdrivePaths(peer, filteredCues) {
       }
 
       const elapsed = Date.now() - driveStart;
-      console.log(`[osmosis:cascade:trace] Completed ${meta.type} [Path: ${drivePath}] via ${dispatchedBranch} in ${elapsed}ms`);
+
       syncedDrives.push({ path: drivePath, branch: dispatchedBranch, durationMs: elapsed });
     })().catch(err => {
       console.error(`[osmosis:cascade:trace] ERROR: Failed to replicate ${meta.type} path ${drivePath}:`, err.stack || err.message);
@@ -123,7 +117,6 @@ export async function replicateHyperdrivePaths(peer, filteredCues) {
   await Promise.all(syncPromises);
 
   const totalDuration = Date.now() - startTime;
-  console.log(`[osmosis:cascade:trace] Atomic replication complete in ${totalDuration}ms. (Bees: ${syncedBees.length}, Drives: ${syncedDrives.length})`);
 
   return {
     syncedBees,
